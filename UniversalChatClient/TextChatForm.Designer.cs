@@ -1,6 +1,6 @@
 ﻿namespace UniversalChatClient;
 
-partial class TextChat
+partial class TextChatForm
 {
     /// <summary>
     ///  Required designer variable.
@@ -80,7 +80,7 @@ partial class TextChat
         sendMessageButton.UseVisualStyleBackColor = true;
         sendMessageButton.Click += sendMessageButton_Click;
         // 
-        // TextChat
+        // TextChatForm
         // 
         AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
         AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
