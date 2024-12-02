@@ -1,3 +1,5 @@
+using UniversalChatContracts.Model;
+
 namespace UniversalChatClient.Application.Hubs.HubEvents;
 
-public delegate void OnMessageReceivedDelegate(string message);
+public delegate void OnMessageReceivedDelegate(TextMessage message);

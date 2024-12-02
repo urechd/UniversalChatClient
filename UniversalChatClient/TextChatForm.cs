@@ -1,4 +1,5 @@
 using UniversalChatClient.Application.Hubs.HubServices.Interfaces;
+using UniversalChatContracts.Model;
 
 namespace UniversalChatClient;
 
@@ -26,15 +27,17 @@ public partial class TextChatForm : Form
         if (string.IsNullOrEmpty(chatTextBox.Text))
             return;
         
-        await _gatewayService.SendMessageAsync(usernameTexBox.Text, chatTextBox.Text);
+        await _gatewayService.SendMessageAsync(chatTextBox.Text);
         chatTextBox.Text = string.Empty;
     }
 
-    private void OnMessageReceived(string message)
+    private void OnMessageReceived(TextMessage message)
     {
+        var text = $"{usernameTexBox.Text}: {message.Text}";
+        
         if (chatBox.InvokeRequired)
-            chatBox.Invoke(new MethodInvoker(delegate { chatBox.Items.Add(message); }));
+            chatBox.Invoke(new MethodInvoker(delegate { chatBox.Items.Add(text); }));
         else
-            chatBox.Items.Add(message);
+            chatBox.Items.Add(text);
     }
 }

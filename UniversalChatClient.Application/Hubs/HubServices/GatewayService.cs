@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using UniversalChatClient.Application.Configuration;
 using UniversalChatClient.Application.Hubs.HubEvents;
 using UniversalChatClient.Application.Hubs.HubServices.Interfaces;
+using UniversalChatContracts.Helpers;
+using UniversalChatContracts.Model;
 
 namespace UniversalChatClient.Application.Hubs.HubServices;
 
@@ -21,7 +23,7 @@ public class GatewayService(IOptions<HubSettings> options) : IGatewayService
             .WithUrl(options.Value.HubEndpoint)
             .Build();
         
-        _hubConnection.On<string>("ReceiveMessage", ReceiveMessage);
+        _hubConnection.On<byte[]>("ReceiveMessage", ReceiveMessage);
     }
 
     public async Task ConnectToHubAsync()
@@ -32,26 +34,35 @@ public class GatewayService(IOptions<HubSettings> options) : IGatewayService
         await _hubConnection.StartAsync();
     }
 
-    public async Task DisconnectFromHubAsync()
+    public Task DisconnectFromHubAsync()
     {
         if (_hubConnection is null)
-            return;
+            return Task.CompletedTask;
         
         _ = _hubConnection.DisposeAsync();
         _hubConnection = null;
+        return Task.CompletedTask;
     }
 
-    public async Task SendMessageAsync(string username, string message)
+    public async Task SendMessageAsync(string message)
     {
         if (_hubConnection is null)
             return;
+
+        var textMessage = new TextMessage
+        {
+            MessageId = Guid.NewGuid(),
+            ChannelId = Guid.NewGuid(),
+            UserId = Guid.NewGuid(),
+            Text = message
+        };
         
-        var user = !string.IsNullOrEmpty(username) ? username : "Demo User";
-        await _hubConnection.InvokeAsync("SendMessage", user, message);
+        await _hubConnection.InvokeAsync("SendMessage", ProtobufHelper.Serialize(textMessage));
     }
 
-    private void ReceiveMessage(string message)
+    private void ReceiveMessage(byte[] message)
     {
-        OnMessageReceived?.Invoke(message);
+        var textMessage = ProtobufHelper.Deserialize<TextMessage>(message);
+        OnMessageReceived?.Invoke(textMessage);
     }
 }

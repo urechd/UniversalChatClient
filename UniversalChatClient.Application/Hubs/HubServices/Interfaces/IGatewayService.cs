@@ -9,5 +9,5 @@ public interface IGatewayService
     void Initialize();
     Task ConnectToHubAsync();
     Task DisconnectFromHubAsync();
-    Task SendMessageAsync(string username, string message);
+    Task SendMessageAsync(string message);
 }
